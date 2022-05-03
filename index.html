@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="./style.css" rel="stylesheet">
+</head>
+<body>
+    < class="player">
+        <!-- Dashboard -->
+        <div class="dashboard">
+          <!-- Header -->
+          <header>
+            <h4>Now playing:</h4>
+            <h2>String 57th & 9th</h2>
+          </header>
+      
+          <!-- CD -->
+          <div class="cd">
+            <div class="cd-thumb" style="background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg')">
+            </div>
+          </div>
+      
+          <!-- Control -->
+          <div class="control">
+            <div class="btn btn-repeat">
+              <i class="fas fa-redo"></i>
+            </div>
+            <div class="btn btn-prev">
+              <i class="fas fa-step-backward"></i>
+            </div>
+            <div class="btn btn-toggle-play">
+                <i class="fas fa-play icon-play"></i>
+            </div>
+            <div class="btn btn-next">
+              <i class="fas fa-step-forward"></i>
+            </div>
+            <div class="btn btn-random">
+              <i class="fas fa-random"></i>
+            </div>
+          </div>
+      
+          <input id="progress" class="progress" type="range" value="0" step="1" min="0" max="100">
+      
+          <audio id="audio" src=""</audio>
+        </div>
+      
+        <!-- Playlist -->
+        <div class="playlist"></div>
+        
+       
+
+        <script>
+            // 1. Render playlist and current song
+            // 2. Scroll top
+            // 3. Play/Pause/Seek
+
+            var $ = document.querySelector.bind(document)
+            var $$ = document.querySelectorAll.bind(document)
+
+            var repeat = $('.btn-repeat')
+            var random = $('.btn-random')
+            var heading = $('header h2')
+            var cdThumb = $('.cd-thumb')
+            var playButton = $('.btn-toggle-play')
+
+            const app = {
+                currentIndex: 0,
+                isRepeatSongs: false,
+                isRandomSongs: false,
+                isPlaying: false,
+                songs: [
+                    {
+                        title:'Roi Toi Luon',
+                        singer:'Nal',
+                        imgUrl:'./images/roi-toi-luon.jpeg',
+                        audioSrc:'./audio/roi-toi-luon.mp3'
+                    },
+
+                    {
+                        title:'Thien Dang',
+                        singer:'Wowwy & Jolipoli',
+                        imgUrl:'./images/thien-dang.jpeg',
+                        audioSrc:'./audio/thien-dang.mp3'
+                    },
+
+                    {
+                        title:'Hoa Hai Duong',
+                        singer:'Jack',
+                        imgUrl:'./images/hoa-hai-duong.jpeg',
+                        audioSrc:'./audio/hoa-hai-duong.mp3'
+                    },
+                
+                    {
+                        title:'Sau Hong Gai',
+                        singer:'G5R Squad',
+                        imgUrl:'./images/sau-hong-gai.jpeg',
+                        audioSrc:'./audio/sau-hong-gai.mp3'
+                    },
+                
+                    {
+                        title:'Thuong Nhau Toi Ben',
+                        singer:'Nal',
+                        imgUrl:'./images/thuong-nhau-toi-ben.jpeg',
+                        audioSrc:'./audio/thuong-nhau-toi-ben.mp3'
+                    },
+                
+                    {
+                        title:'Khue Moc Lang',
+                        singer:'Huong Ly',
+                        imgUrl:'./images/khue-moc-lang.jpeg',
+                        audioSrc:'./audio/khue-moc-lang.mp3'
+                    }
+                ],
+
+                // Them thuoc tinh Current Song
+                defineProperties: function() {
+                    Object.defineProperty(this,"currentSong", {
+                        get: function() {
+                            return this.songs[this.currentIndex]
+                        }
+                    })
+                },
+
+                // Load bai hat hien tai
+                loadCurrentSong: function() {
+                    var audio = $('#audio')
+                    heading.textContent = this.currentSong.title
+                    cdThumb.style.backgroundImage = `url('${this.currentSong.imgUrl}')`
+                    audio.src = this.currentSong.audioSrc
+                    audio.muted = 'muted'
+                    audio.autoplay = 'true'
+                },
+
+                // Phat nhac, dung nhac
+                playAndPause: function() {                    
+                    audio.onplay = function() {
+                        cdThumb.style.animation = 'rotate 10s linear 0s infinite'
+                        playButton.innerHTML = '<i class="fas fa-pause icon-pause"></i>'
+                        app.isPlaying = true
+
+                    }
+                    audio.onpause = function() {
+                        cdThumb.style.animation = 'none'
+                        playButton.innerHTML = '<i class="fas fa-play icon-play"></i>'
+                        app.isPlaying = false
+                    }
+
+                    playButton.onclick = function() {
+                        if (!app.isPlaying) {audio.play()}
+                        else {audio.pause()}
+                        }
+                    
+                    },
+                
+                    
+                // Render playlist
+                renderPlaylist: function() {
+                    var playlist = $('.playlist')
+                    var render = this.songs.map(function(song) {
+                        return `<div class="song">
+                            <div class="thumb" style="background-image: url(${song.imgUrl})"></div>
+                            <div class="body">
+                                <h3 class="title">${song.title}</h3>
+                                <p class="author">${song.singer}</p>
+                                </div>
+                                <div class="option">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                    </div>
+                                    </div>`
+                                })
+
+                                playlist.innerHTML = render.join('')
+                            },
+                            
+                // Chuyen bai
+                changeSongs: function() {
+                    var songButtons = $$('.song')
+                    songButtons.forEach(function(songButton, index) {
+                        songButton.onclick = function() {
+                            app.currentIndex = index
+                            app.currentSong
+                            app.loadCurrentSong()
+                            app.playMusic()
+                        }
+                    })
+                },
+
+                // Scroll animation
+                scrollAnimation: function() {
+                    var CD = document.querySelector('.cd')
+                    var CDWidth = CD.offsetWidth
+                    document.onscroll = function() {
+                        if (document.documentElement.scrollTop >= 0) {
+                            var CDNewWidth = CDWidth - (document.documentElement.scrollTop || window.scrollY);
+                            CD.style.width = CDNewWidth + 'px';
+                            CD.style.opacity = CDNewWidth/CDWidth
+                        } else { CD.style.width = 0}                       
+                    }
+                },
+
+                // Time animation
+                timeAnimation: function() {
+                    var progress = $('.progress')
+                    audio.ontimeupdate = function() {
+                        if (audio.duration>0) { progress.value = audio.currentTime / audio.duration * 100 }
+                        /*  progress.value.oninput = function() {
+                            console.log(audio.currentTime) */
+                        }
+              /*       progress.value.onchange = function() {
+                        if (audio.duration>0) { 
+                                var timeUpdate = progress.value / 100 * audio.duration
+                                audio.currentTime = timeUpdate
+                                console.log(audio.currentTime)
+                                console.log(progress.value)
+                                console.log(audio.duration)
+                            } */
+                            
+                },
+
+                // Choi nhac
+                playMusic: function() {
+                    $('.btn-toggle-play').innerHTML = '<i class="fas fa-pause icon-pause"></i>'
+                    audio.play()
+                    app.isPlaying = true
+                },
+
+                // Chuyen bai
+                nextSong: function() {
+                    var next = $('.btn-next')
+                    next.onclick = function() {
+                        if (app.isRandomSongs) {
+                            do { 
+                                var randomMath = Math.floor(Math.random() * app.songs.length)
+                            }
+                            while (randomMath == app.currentIndex) 
+                            app.currentIndex = randomMath
+                        } else if ((app.songs.length - 1) == app.currentIndex) { 
+                            app.currentIndex = 0
+                        } else {app.currentIndex++}
+                        app.loadCurrentSong()
+                        app.playMusic()
+                    }  
+                },
+                prevSong: function() {
+                    var prev = $('.btn-prev')
+                    prev.onclick = function() {
+                        if (app.isRandomSongs) {
+                            do { 
+                                var randomMath = Math.floor(Math.random() * app.songs.length)
+                            }
+                            while (randomMath == app.currentIndex) 
+                            app.currentIndex = randomMath
+                        } else if (app.currentIndex > 0) { 
+                            app.currentIndex--
+                        } else {app.currentIndex = 0}
+                        app.loadCurrentSong()
+                        app.playMusic()
+                    }  
+                },
+
+                autoNextSong: function() {
+                    audio.onended = function() {
+                        if (app.isRepeatSongs) {
+                            if (app.currentIndex == (app.songs.length - 1)) {
+                                app.currentIndex = 0
+                            } else {
+                                app.currentIndex++
+                            } 
+                        } else {
+                            app.currentIndex++
+                        }
+                        if (app.isRandomSongs) {
+                            do { 
+                                var randomMath = Math.floor(Math.random() * app.songs.length)
+                            }
+                            while (randomMath == app.currentIndex) 
+                            app.currentIndex = randomMath
+                        }
+                        app.loadCurrentSong()
+                        app.playMusic()
+                    }
+                },
+
+                repeatSongs: function() {
+                    repeat.onclick = function() {
+                        if (!app.isRepeatSongs) {
+                            repeat.style.color = '#ec1f55'
+                            app.isRepeatSongs = true
+                            random.style.color = '#666'
+                            app.isRandomSongs = false
+                        } else {
+                            repeat.style.color = '#666'
+                            app.isRepeatSongs = false
+                        }
+                    }
+
+                },
+                
+                randomSongs: function() {
+                    random.onclick = function() {
+                        if (!app.isRandomSongs) {
+                            random.style.color = '#ec1f55'
+                            app.isRandomSongs = true
+                            repeat.style.color = '#666'
+                            app.isRepeatSongs = false
+                        } else {
+                            random.style.color = '#666'
+                            app.isRandomSongs = false
+                        }
+                    }
+                },
+
+                start: function() {
+                    app.defineProperties()
+                    app.loadCurrentSong()
+                    app.renderPlaylist()
+                    app.scrollAnimation()
+                    app.playAndPause()
+                    app.changeSongs()
+                    app.timeAnimation()
+                    app.nextSong()
+                    // app.playMusic()
+                    app.prevSong()
+                    app.autoNextSong()
+                    app.repeatSongs()
+                    app.randomSongs()
+                }
+            }
+
+            app.start()
+        </script>
+</body>
+</html>
